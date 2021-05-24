@@ -4,7 +4,7 @@ from Edit import *
 from New import *
 
 # TBD:
-# - Database-Encryption with master password
+# - Database-Encryption with master password?
 # - Fix Password-Label-Height
 # - Fix Bug at the bottom
 
@@ -23,45 +23,45 @@ class Main(ttk.Frame):
         initialize_db()
         # main frame
         main_window.title("Password-Manager")
-        main_window.geometry("600x500")
-        main_window.minsize(1039, 500)
+        # center displayed main frame
+        main_window.geometry("1039x500+200+180")
         main_window.maxsize(1200, 500)
 
         for col in range(4):
             main_window.grid_columnconfigure(col, minsize=30)
 
-        for row in range(9):
-            main_window.grid_rowconfigure(row, minsize=10)
-
         # all entries
-        entry_list_frame = Frame(main_window, bd=7)
-        entry_list_frame.place(rely=0.2, relwidth=1, anchor="nw")
+        entry_list_frame = Frame(main_window, bd=15)
+        entry_list_frame.place(rely=0.2, anchor="nw")
 
-        # configure column-frontend for main window
+        # configure columns to display a prettier order of buttons
         for counter in range(9):
             main_window.columnconfigure(counter, uniform='column')
 
+        # delete button
         delete_button = Button(main_window, text="Delete entry", bg="#753030", fg="white", command=self.delete)
         delete_button.grid(row=0, column=2, ipadx=5, ipady=5)
-        Hovertip(delete_button, 'Delete selected entry of list.')
+        Hovertip(delete_button, 'Delete the selected list entry.')
 
+        # edit button
         edit_button = Button(main_window, text="Edit entry", bg="#8f6325", fg="white",
                              command=lambda: Edit(self.selected_row_id, self.read))
         edit_button.grid(row=0, column=1, ipadx=5, ipady=5)
-        Hovertip(edit_button, 'Edit selected entry of list.')
+        Hovertip(edit_button, 'Edit the selected list entry.')
 
         # add button
         add_btn = Button(main_window, text="New entry", bg="#4a7d4f", fg="white", command=lambda: New(self.read))
         add_btn.grid(row=0, column=0, ipadx=5, ipady=5, padx=(15, 0))
         Hovertip(edit_button, 'Add a new entry to the list.')
 
+        # copy button
         copy_btn = Button(main_window, text="copy pw",
                           command=lambda: self.copy_to_clipboard(self.selected_row_id))
         copy_btn.grid(row=0, column=8, ipadx=5, ipady=5)
         Hovertip(copy_btn, 'Copy password of selected entry to clipboard.')
 
-        # hide and show button
-        self.hide_btn = Button(main_window, text="Hide entries", command=lambda: self.read(False))
+        # "hide and show passwords" button
+        self.hide_btn = Button(main_window, text="Hide passwords", command=lambda: self.read(False))
         self.hide_btn.grid(row=0, column=9, ipadx=5, ipady=5)
         Hovertip(self.hide_btn, 'Show/Hide passwords in clear text.')
 
@@ -69,37 +69,38 @@ class Main(ttk.Frame):
         self.entries_label = Label(entry_list_frame, anchor="nw", justify="left")
         self.entries_label.grid(row=1, column=1)
 
+        # at the end of the frontend-configuration, read all the entries from the database
         self.read(False)
 
     def read(self, show=False):
         """reads all entries from the database and prints them into the table"""
 
-        # clear the string, in case this is a callback from Edit
+        # clear the selected row, in case this is a callback-call from Edit
         self.selected_row_id = ""
 
-        # change hide-buttons onclick-command
+        # change text and onclick-command of hide-button
         if bool(show):
-            self.hide_btn.configure(text="Hide entries", command=lambda: self.read(False))
+            self.hide_btn.configure(text="Hide passwords", command=lambda: self.read(False))
         else:
             self.entries_label['text'] = ""
-            self.hide_btn.configure(text="Show entries", command=lambda: self.read(True))
+            self.hide_btn.configure(text="Show passwords", command=lambda: self.read(True))
 
+        # read all entries
         entries = read_from_database()
 
         # create table
-        cols = ('NR.', 'TITLE', 'URL', 'USERNAME', 'PASSWORD')
-
+        cols = ('NO.', 'TITLE', 'URL', 'USERNAME', 'PASSWORD')
         self.tree = ttk.Treeview(self.entries_label, columns=cols, show='headings')
         self.tree.grid(row=1, column=0, columnspan=1)
 
         # onclick event on table row to copy paste password
         self.tree.bind('<ButtonRelease-1>', self.get_selected_row)
 
-        # fill table headers
+        # fill in table headers
         for col in cols:
             self.tree.heading(col, text=col)
 
-        # fill table rows
+        # fill in table rows
         if len(entries) > 0:
             for entry in entries:
                 self.tree.insert("", "end",
@@ -112,7 +113,11 @@ class Main(ttk.Frame):
         """Deletes the selected entry-row from the database"""
 
         id_param = self.selected_row_id
+
+        # if a row has been selected
         if id_param != "":
+
+            # if entry exists in database
             if read_one_from_database(id_param):
                 success = delete_entry(str(id_param))
                 if success:
@@ -140,15 +145,19 @@ class Main(ttk.Frame):
         """copies the stored id to the clipboard.
         Is used to edit an entry or copy the password from a selected row.."""
 
-        # temporary window to store input on and destroy
+        # temporary window to store input on
         temp = Tk()
         temp.withdraw()
         temp.clipboard_clear()
+
         id_of_item = self.selected_row_id
 
+        # if a row has been selected
         if id_of_item != "":
             try:
+                # should return one item only
                 entries = read_one_from_database(id_of_item)
+                # item is wrapped in a list, therefore we need to call [0] before we select the value.
                 temp.clipboard_append(entries[0][3])
                 temp.update()
             except Exception:
@@ -162,6 +171,6 @@ class Main(ttk.Frame):
 root = Tk()
 gui = Main(root)
 root.mainloop()
-# fix to a bug, where the main window reopened itself upon close
-# TBD: triggers _tkinter.TclError: can't invoke "destroy" command: application has been destroyed
+# following line fixed a bug, where the main window reopened itself upon close
+# TBD: line triggers '_tkinter.TclError: can't invoke "destroy" command: application has been destroyed'
 root.destroy()

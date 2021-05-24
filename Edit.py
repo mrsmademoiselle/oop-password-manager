@@ -16,13 +16,12 @@ class Edit(Tk):
             try:
                 if read_one_from_database(id_to_edit):
 
+                    # main frame
                     self.edit = Toplevel()
                     self.edit.title("Edit entry")
-                    self.edit.geometry("500x400")
-                    self.edit.minsize(450, 300)
-                    self.edit.maxsize(450, 300)
+                    self.edit.geometry("450x150+500+250")
 
-                    # Create Text Boxes
+                    # text fields
                     self.title_edit = Entry(self.edit, width=30)
                     self.title_edit.grid(row=0, column=1, padx=20)
                     self.url_edit = Entry(self.edit, width=30)
@@ -32,8 +31,8 @@ class Edit(Tk):
                     self.password_edit = Entry(self.edit, width=30)
                     self.password_edit.grid(row=3, column=1, padx=20)
 
-                    # Create Text Box Labels
-                    self.title_label_edit = Label(self.edit, text="title:")
+                    # labels
+                    self.title_label_edit = Label(self.edit, text="Title:")
                     self.title_label_edit.grid(row=0, column=0)
                     self.url_label_edit = Label(self.edit, text="URL:")
                     self.url_label_edit.grid(row=1, column=0)
@@ -42,12 +41,13 @@ class Edit(Tk):
                     self.password_label_edit = Label(self.edit, text="Password:")
                     self.password_label_edit.grid(row=3, column=0)
 
-                    # Create Save Button
+                    # save button
                     self.submit_btn_edit = Button(self.edit, text="Save entry", command=lambda: self.update(callback))
                     self.submit_btn_edit.grid(row=4, column=0, columnspan=2, pady=5, padx=15, ipadx=135)
 
                     records = read_one_from_database(id_to_edit)
 
+                    # fill textfields with entry-data
                     for record in records:
                         self.title_edit.insert(0, record[0])
                         self.url_edit.insert(0, record[1])
@@ -63,14 +63,18 @@ class Edit(Tk):
     def update(self, callback=None):
         """Updates the entry with the new data"""
 
+        # entry must at least contain a title and a password
         if self.title_edit.get() != "" and self.password_edit.get() != "":
+
             entry = Password_Entry(self.title_edit.get(), self.password_edit.get(), self.url_edit.get(),
                                    self.username_edit.get(), self.selected_row_id)
             update_entry(entry)
 
             messagebox.showinfo("Info", "The entry has been updated in the database!")
             self.edit.destroy()
-            selected_row_id = ""
+            self.selected_row_id = ""
+
+            # callback is usually read() to update the list after editing an entry
             callback()
 
         else:
