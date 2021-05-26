@@ -5,7 +5,6 @@ from New import *
 
 # TBD:
 # - Database-Encryption with master password?
-# - Fix Password-Label-Height
 # - Fix Bug at the bottom
 
 
@@ -58,6 +57,7 @@ class Main(ttk.Frame):
         self.search_box = Entry(main_window, width=30)
         self.search_box.grid(row=0, columnspan=2, column=8, ipadx=5, ipady=5, padx=(15, 0))
 
+        # search button
         search_btn = Button(main_window, text="search", command=self.search_entries)
         search_btn.grid(row=0, column=10, ipady=3, pady=10)
         Hovertip(search_btn, 'Search entries for the input.')

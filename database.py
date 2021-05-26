@@ -25,7 +25,11 @@ def search_entries(term):
     conn = sqlite3.connect("passwordEntries.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM passwordEntry where id LIKE :term or titel LIKE :term or url LIKE :term or username LIKE :term", { 'term': "%{}%".format(term)})
+    cursor.execute("""SELECT * FROM passwordEntry where id LIKE :term
+                   or titel LIKE :term 
+                   or url LIKE :term 
+                   or username LIKE :term""",
+                   {'term': "%{}%".format(term)})
     records = cursor.fetchall()
 
     conn.commit()
