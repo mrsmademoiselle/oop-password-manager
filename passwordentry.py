@@ -1,11 +1,9 @@
-import hashlib
-import random
-import string
-import re
-import binascii
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# __author__ = "Franziska Loof, 307583"
 
 
-class Password_Entry:
+class PasswordEntry:
 
     def __init__(self, titel, passwort, url, username, nummer):
         self.id = nummer

@@ -1,11 +1,15 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# __author__ = "Franziska Loof, 307583"
+
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 from Edit import *
 from New import *
 
 # TBD:
-# - Database-Encryption with master password?
-# - Fix Bug at the bottom
+# - Database-Encryption with master password
+# - Fix Bug at the bottom of Main.py
 
 
 class Main(ttk.Frame):

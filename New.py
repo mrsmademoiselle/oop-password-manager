@@ -1,9 +1,13 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# __author__ = "Franziska Loof, 307583"
+
 import string
 import random
 from tkinter import *
 from tkinter import messagebox
 from database import *
-from password_entry import Password_Entry
+from passwordentry import PasswordEntry
 
 
 class New(Tk):
@@ -135,8 +139,8 @@ class New(Tk):
 
             # password and confirm text fields must be the same
             if self.password.get() == self.password_confirm.get():
-                entry = Password_Entry(self.title.get(), self.password.get(), self.url.get(), self.username.get(),
-                                       str(new_index))
+                entry = PasswordEntry(self.title.get(), self.password.get(), self.url.get(), self.username.get(),
+                                      str(new_index))
 
                 # color text fields with white, in case they had been filled with red
                 self.password.configure(highlightbackground='white', highlightcolor='white')
