@@ -20,6 +20,20 @@ def initialize_db():
     conn.close()
 
 
+def search_entries(term):
+    """Searches the database entries for the given terms"""
+    conn = sqlite3.connect("passwordEntries.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM passwordEntry where id LIKE :term or titel LIKE :term or url LIKE :term or username LIKE :term", { 'term': "%{}%".format(term)})
+    records = cursor.fetchall()
+
+    conn.commit()
+    conn.close()
+
+    return records
+
+
 def add_to_database(entry):
     """Adds the given entry to the database"""
 

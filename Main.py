@@ -54,15 +54,28 @@ class Main(ttk.Frame):
         add_btn.grid(row=0, column=0, ipadx=5, ipady=5, padx=(15, 0))
         Hovertip(edit_button, 'Add a new entry to the list.')
 
+        # search box
+        self.search_box = Entry(main_window, width=30)
+        self.search_box.grid(row=0, columnspan=2, column=8, ipadx=5, ipady=5, padx=(15, 0))
+
+        search_btn = Button(main_window, text="search", command=self.search_entries)
+        search_btn.grid(row=0, column=10, ipady=3, pady=10)
+        Hovertip(search_btn, 'Search entries for the input.')
+
+        # button to delete any search filters and show all elements
+        delete_filters = Button(main_window, text="X", command=self.clear_search, bg="red", fg="white", font='sans 9 bold')
+        delete_filters.grid(row=0, columnspan=2, column=11, ipady=3, ipadx=3, padx=5)
+        Hovertip(delete_filters, 'Delete all search filters')
+
         # copy button
         copy_btn = Button(main_window, text="copy pw",
                           command=lambda: self.copy_to_clipboard(self.selected_row_id))
-        copy_btn.grid(row=0, column=8, ipadx=5, ipady=5)
+        copy_btn.grid(row=1, column=8, ipadx=5, ipady=5)
         Hovertip(copy_btn, 'Copy password of selected entry to clipboard.')
 
         # "hide and show passwords" button
         self.hide_btn = Button(main_window, text="Hide passwords", command=lambda: self.read(False))
-        self.hide_btn.grid(row=0, column=9, ipadx=5, ipady=5)
+        self.hide_btn.grid(row=1, column=9, ipadx=5, ipady=5)
         Hovertip(self.hide_btn, 'Show/Hide passwords in clear text.')
 
         # password box
@@ -71,6 +84,24 @@ class Main(ttk.Frame):
 
         # at the end of the frontend-configuration, read all the entries from the database
         self.read(False)
+
+    def clear_search(self):
+        """deletes all search filters"""
+
+        self.search_box.delete(0, END)
+        self.read(False)
+
+    def search_entries(self):
+        """reads all entries from the database that match the terms and prints them into the table"""
+
+        search_term = self.search_box.get()
+
+        if search_term:
+            results = search_entries(search_term)
+            self.hide_btn.configure(text="Show passwords", command=lambda: self.read(True))
+            self.create_table(results, False)
+        else:
+            self.read(False)
 
     def read(self, show=False):
         """reads all entries from the database and prints them into the table"""
@@ -86,7 +117,17 @@ class Main(ttk.Frame):
             self.hide_btn.configure(text="Show passwords", command=lambda: self.read(True))
 
         # read all entries
-        entries = read_from_database()
+        # if search box isnt empty (= search filter on),
+        # use search results instead of all entries
+        search_term = self.search_box.get()
+        if search_term:
+            entries = search_entries(search_term)
+        else:
+            entries = read_from_database()
+
+        self.create_table(entries, show)
+
+    def create_table(self, entry_list, show):
 
         # create table
         cols = ('NO.', 'TITLE', 'URL', 'USERNAME', 'PASSWORD')
@@ -101,8 +142,8 @@ class Main(ttk.Frame):
             self.tree.heading(col, text=col)
 
         # fill in table rows
-        if len(entries) > 0:
-            for entry in entries:
+        if len(entry_list) > 0:
+            for entry in entry_list:
                 self.tree.insert("", "end",
                                  values=(entry[4], entry[0], entry[1], entry[2],
                                          entry[3] if show else "**********"))
