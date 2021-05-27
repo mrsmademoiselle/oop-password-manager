@@ -9,7 +9,8 @@ from New import *
 
 # TBD:
 # - Database-Encryption with master password
-# - Fix Bug at the bottom of Main.py
+# - Bugfix: Bug at the bottom of the Main.py file
+# - Visual scrollbar: to indicate that scrolling is possible
 
 
 class Main(ttk.Frame):
@@ -24,16 +25,15 @@ class Main(ttk.Frame):
         self.entries_label = None
 
         initialize_db()
-        # main frame
         main_window.title("Password-Manager")
-        # center displayed main frame
+        # center the displayed main frame
         main_window.geometry("1039x500+200+180")
         main_window.maxsize(1200, 500)
 
         for col in range(4):
             main_window.grid_columnconfigure(col, minsize=30)
 
-        # all entries
+        # frame for password-entry-list
         entry_list_frame = Frame(main_window, bd=15)
         entry_list_frame.place(rely=0.2, anchor="nw")
 
@@ -62,24 +62,24 @@ class Main(ttk.Frame):
         self.search_box.grid(row=0, columnspan=2, column=8, ipadx=5, ipady=5, padx=(15, 0))
 
         # search button
-        search_btn = Button(main_window, text="search", command=self.search_entries)
+        search_btn = Button(main_window, text="Search", command=self.search_entries)
         search_btn.grid(row=0, column=10, ipady=3, pady=10)
         Hovertip(search_btn, 'Search entries for the input.')
 
         # button to delete any search filters and show all elements
-        delete_filters = Button(main_window, text="X", command=self.clear_search, bg="red", fg="white", font='sans 9 bold')
-        delete_filters.grid(row=0, columnspan=2, column=11, ipady=3, ipadx=3, padx=5)
+        delete_filters = Button(main_window, text="×", command=self.clear_search, fg="red", font='sans 13 bold')
+        delete_filters.grid(row=0, columnspan=2, column=11, padx=5)
         Hovertip(delete_filters, 'Delete all search filters')
 
         # copy button
-        copy_btn = Button(main_window, text="copy pw",
+        copy_btn = Button(main_window, text="Copy password",
                           command=lambda: self.copy_to_clipboard(self.selected_row_id))
-        copy_btn.grid(row=1, column=8, ipadx=5, ipady=5)
+        copy_btn.grid(row=1, column=8,ipady=5, columnspan=2)
         Hovertip(copy_btn, 'Copy password of selected entry to clipboard.')
 
         # "hide and show passwords" button
         self.hide_btn = Button(main_window, text="Hide passwords", command=lambda: self.read(False))
-        self.hide_btn.grid(row=1, column=9, ipadx=5, ipady=5)
+        self.hide_btn.grid(row=1, column=9, ipady=5, columnspan=2)
         Hovertip(self.hide_btn, 'Show/Hide passwords in clear text.')
 
         # password box
@@ -216,6 +216,7 @@ class Main(ttk.Frame):
 root = Tk()
 gui = Main(root)
 root.mainloop()
-# following line fixed a bug, where the main window reopened itself upon close
-# TBD: line triggers '_tkinter.TclError: can't invoke "destroy" command: application has been destroyed'
+# following line fixed a bug, where the main window would reopen itself upon x-ing it
+# However, the line also triggers following Exception upon x-ing the window:
+# '_tkinter.TclError: can't invoke "destroy" command: application has been destroyed'
 root.destroy()

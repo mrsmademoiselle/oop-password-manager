@@ -52,9 +52,10 @@ class Edit(Tk):
                     self.submit_btn_edit = Button(self.edit, text="Save entry", command=lambda: self.update(callback))
                     self.submit_btn_edit.grid(row=6, column=0, columnspan=2, pady=5, padx=15, ipadx=135)
 
+                    # get selected entry from database
                     records = read_one_from_database(id_to_edit)
 
-                    # fill textfields with entry-data
+                    # fill textfields with data of selected entry
                     for record in records:
                         self.title_edit.insert(0, record[0])
                         self.url_edit.insert(0, record[1])
@@ -74,10 +75,14 @@ class Edit(Tk):
         # entry must at least contain a title and a password
         if self.title_edit.get() != "" and self.password_edit.get() != "":
 
+            # password-input and confirm-input must be the same
             if self.password_edit.get() == self.password_confirm_edit.get():
 
+                # forge a PasswordEntry-Object out of input fields
                 entry = PasswordEntry(self.title_edit.get(), self.password_edit.get(), self.url_edit.get(),
                                       self.username_edit.get(), self.selected_row_id)
+
+                # update entry in database
                 update_entry(entry)
 
                 messagebox.showinfo("Info", "The entry has been updated in the database!")
@@ -87,9 +92,9 @@ class Edit(Tk):
                 # callback is usually read() to update the list after editing an entry
                 callback()
             else:
-                self.title_label = Label(self.edit, fg="gray",
-                                         text="The passwords must be the same.")
-                self.title_label.grid(row=8, column=0, columnspan=3)
+                title_label = Label(self.edit, fg="gray",
+                                    text="The passwords must be the same.")
+                title_label.grid(row=8, column=0, columnspan=3)
 
                 self.password_edit.config(bg="#f08f89")
                 self.password_confirm_edit.config(bg="#f08f89")

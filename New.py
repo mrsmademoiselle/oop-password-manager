@@ -97,33 +97,42 @@ class New(Tk):
 
         length_field = self.length.get()
 
+        # length-field must not be empty in order to autogenerate a pw
         if length_field != "":
             # regex for only numbers on length-textfield
             if re.fullmatch("^[0-9]*$", length_field):
                 self.password.delete(0, END)
 
-                # if/else for the ticked checkboxes (numbers, special chars)
+                # letters, numbers and special chars
                 if self.numbersVar.get() and self.special_var.get():
                     text = ''.join(random.choice(string.ascii_uppercase + string.digits + string.punctuation)
                                    for _ in range(int(length_field)))
+                # letters and numbers
                 elif self.numbersVar.get():
                     text = ''.join(
                         random.choice(string.ascii_uppercase + string.digits) for _ in range(int(length_field)))
+
+                # letters and special chars
                 elif self.special_var.get():
                     text = ''.join(random.choice(string.ascii_uppercase + string.punctuation)
                                    for _ in range(int(length_field)))
+                # letters only
                 else:
                     text = ''.join(random.choice(string.ascii_uppercase) for _ in range(int(length_field)))
 
+                # automatically fill in password textfield after autogeneration
                 self.password.insert(0, text)
+
                 self.title_label = Label(self.add_window, fg="gray",
                                          text="The password has automatically been inserted. "
                                               "Please confirm the password manually.")
                 self.title_label.grid(row=7, column=2, columnspan=4)
+            # if length-field contains anything other than numbers
             else:
                 self.title_label = Label(self.add_window, fg="gray",
                                          text="The specified length must be numeric.")
                 self.title_label.grid(row=7, column=3, columnspan=3)
+        # if length-field is empty
         else:
             self.title_label = Label(self.add_window, fg="gray",
                                      text="You must specify a length for the password.")
